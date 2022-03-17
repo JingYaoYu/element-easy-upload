@@ -6,7 +6,6 @@ export default {
       uploadText = '选取文件',
       action,
       name = 'file',
-      fileName = '',
       templateURL,
       data = {},
       headers = {},
@@ -51,13 +50,12 @@ export default {
         uploadText: { type: String, default: uploadText },
         action: { type: String, required: !action, default: action },
         name: { type: String, default: name },
-        fileName: { type: String, default: fileName, required: true },
         templateURL: { type: String, default: templateURL },
         theme: { type: String, default: theme },
         templateParams: { type: Object, default: () => templateParams },
         data: { type: Object, default: () => data },
         headers: { type: Object, default: () => headers },
-        fileList: { type: Array, default: () => fileList },
+        fileList: { type: Array, default: () => fileList, required: true, validator: v => v && Array.isArray(v) },
         limit: { type: Number, default: limit, validator: v => v > 0 },
         size: { type: Number, default: size, validator: v => v > 0 },
         withCredentials: { type: Boolean, default: withCredentials },
@@ -186,7 +184,6 @@ export default {
             ref: 'uploader',
             props: {
               ...this.$props,
-              data: { ...this.data, fileName: this.fileName },
               beforeUpload: file => beforeUpload && beforeUpload(file, this),
               onSuccess: (response, file, fileList) => {
                 this.$emit('change', fileList)
