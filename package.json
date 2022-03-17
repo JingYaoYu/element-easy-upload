@@ -1,6 +1,6 @@
 {
   "name": "@iamgx/easy-upload",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "easy-upload",
   "private": false,
   "main": "./dist/easy-upload.umd.min.js",
