@@ -6,7 +6,7 @@ export default {
       uploadText = '选取文件',
       action,
       name = 'file',
-      fileName,
+      fileName = '',
       templateURL,
       data = {},
       headers = {},
@@ -42,13 +42,16 @@ export default {
 
     const EasyUpload = {
       name: componentName,
+      model: {
+        prop: 'fileList',
+        event: 'change'
+      },
       props: {
         listType: { type: String, default: listType },
         uploadText: { type: String, default: uploadText },
         action: { type: String, required: !action, default: action },
-        value: { type: String, default: '' }, // `${+new Date()}`
         name: { type: String, default: name },
-        fileName: { type: String, default: fileName },
+        fileName: { type: String, default: fileName, required: true },
         templateURL: { type: String, default: templateURL },
         theme: { type: String, default: theme },
         templateParams: { type: Object, default: () => templateParams },
@@ -93,16 +96,6 @@ export default {
         submit() {
           this.$refs.uploader.submit()
         }
-      },
-      created() {
-        const unWatch = this.$watch(
-          'fileList',
-          v => {
-            this.$emit('input', v.length > 0 ? this.value || this.generateUuid() : '')
-          },
-          { immediate: true }
-        )
-        this.$once('hook:beforeDestory', unWatch)
       },
       render(h) {
         const {
@@ -192,11 +185,11 @@ export default {
               data: { ...this.data, fileName: this.fileName },
               beforeUpload: file => beforeUpload && beforeUpload(file, this),
               onSuccess: (response, file, fileList) => {
-                this.$emit('update:file-list', fileList)
+                this.$emit('change', fileList)
                 onSuccess && onSuccess(response, file, fileList)
               },
               onRemove: (file, fileList) => {
-                this.$emit('update:file-list', fileList)
+                this.$emit('change', fileList)
                 onRemove && onRemove(file, fileList)
               }
             }
