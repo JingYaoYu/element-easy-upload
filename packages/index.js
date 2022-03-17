@@ -58,8 +58,8 @@ export default {
         data: { type: Object, default: () => data },
         headers: { type: Object, default: () => headers },
         fileList: { type: Array, default: () => fileList },
-        limit: { type: Number, default: limit },
-        size: { type: Number, default: size },
+        limit: { type: Number, default: limit, validator: v => v > 0 },
+        size: { type: Number, default: size, validator: v => v > 0 },
         withCredentials: { type: Boolean, default: withCredentials },
         multiple: { type: Boolean, default: multiple },
         drag: { type: Boolean, default: drag },
@@ -119,7 +119,11 @@ export default {
 
         const defaultChildren = this.$slots.default
         const tip = this.$slots.tip
-        const uploadTipText = tip || `只能上传${accept}文件，最多上传${limit}个, 且不超过${size}MB`
+        const uploadTipText = tip || [
+          accept && `只能上传${accept}文件，`,
+          limit > 0 && `最多上传${limit}个,`,
+          `且不超过${size}MB`
+        ]
         const isTextView = listType === 'text'
         const textViewUploadStyle = `.el-upload {display: block;}.el-upload-list__item:first-child{margin-top: 0;}`
         const themeClass = theme ? `.color-theme { color: ${theme};}` : ''
