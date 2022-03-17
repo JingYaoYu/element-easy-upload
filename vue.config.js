@@ -21,7 +21,11 @@ module.exports =
         }
       }
     : {
-        chainWebpack(config) {
+        chainWebpack: config => {
+          config.externals({
+            vue: 'Vue',
+            'element-ui': 'ElementUi'
+          })
           config.module.rule('js').include.add('/packages/index.js').end()
         },
         configureWebpack: {

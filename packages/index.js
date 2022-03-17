@@ -6,6 +6,7 @@ export default {
       uploadText = '选取文件',
       action,
       name = 'file',
+      fileName,
       templateURL,
       data = {},
       headers = {},
@@ -19,8 +20,9 @@ export default {
       viewWithCount = false,
       autoUpload = true,
       showFileList = true,
-      accept = 'image/png',
+      accept,
       onStart,
+      generateUuid,
       onProgress,
       onSuccess,
       onError,
@@ -37,14 +39,16 @@ export default {
     } = opts
 
     const isFunctionValue = (k, dv) => (typeof opts[k] === 'function' ? opts[k]() : opts[k] || dv)
+
     const EasyUpload = {
       name: componentName,
       props: {
         listType: { type: String, default: listType },
         uploadText: { type: String, default: uploadText },
         action: { type: String, required: !action, default: action },
-        value: { type: [String, Number], default: isFunctionValue('defaultValue', +new Date().toString()) },
+        value: { type: String, default: '' }, // `${+new Date()}`
         name: { type: String, default: name },
+        fileName: { type: String, default: fileName },
         templateURL: { type: String, default: templateURL },
         theme: { type: String, default: theme },
         templateParams: { type: Object, default: () => templateParams },
@@ -71,6 +75,10 @@ export default {
         httpRequest: { type: Function, default: httpRequest },
         beforeRemove: { type: Function, default: beforeRemove },
         onPreview: { type: Function, default: onPreview },
+        generateUuid: {
+          type: Function,
+          default: generateUuid ? generateUuid : () => `${+new Date()}`
+        },
         renderPopoverReference: { type: Function, default: renderPopoverReference },
         onTemplateDownload: { type: Function, default: onTemplateDownload },
         onRemove: { type: Function, default: onRemove }
@@ -85,6 +93,16 @@ export default {
         submit() {
           this.$refs.uploader.submit()
         }
+      },
+      created() {
+        const unWatch = this.$watch(
+          'fileList',
+          v => {
+            this.$emit('input', v.length > 0 ? this.value || this.generateUuid() : '')
+          },
+          { immediate: true }
+        )
+        this.$once('hook:beforeDestory', unWatch)
       },
       render(h) {
         const {
@@ -171,6 +189,7 @@ export default {
             ref: 'uploader',
             props: {
               ...this.$props,
+              data: { ...this.data, fileName: this.fileName },
               beforeUpload: file => beforeUpload && beforeUpload(file, this),
               onSuccess: (response, file, fileList) => {
                 this.$emit('update:file-list', fileList)
