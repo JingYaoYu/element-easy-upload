@@ -41,7 +41,7 @@ export default {
     const EasyUpload = {
       name: componentName,
       model: {
-        prop: 'value',
+        prop: 'fileList',
         event: 'change'
       },
       props: {
@@ -49,7 +49,6 @@ export default {
         uploadText: { type: String, default: uploadText },
         action: { type: String, required: !action, default: action },
         name: { type: String, default: name },
-        value: { type: [Object, Array], required: true },
         templateURL: { type: String, default: templateURL },
         theme: { type: String, default: theme },
         templateParams: { type: Object, default: () => templateParams },
@@ -140,6 +139,7 @@ export default {
           .el-upload-dragger .el-icon-folder-opened { opacity: 0; transform: translateX(100%); }
           .el-upload-dragger.is-dragover .el-icon-folder{ opacity: 0; transform: translateX(-100%); }
           .el-upload-dragger.is-dragover .el-icon-folder-opened{ opacity: 1; transform: translateX(0) scale(1.1); }
+          ${disabled && '.el-upload {display: none}'}
         `
 
         const UploadStyle = h('style', [isTextView && disabled && textViewUploadStyle, dragUploadStyle].join(' '))
@@ -184,18 +184,20 @@ export default {
             ref: 'uploader',
             props: {
               ...this.$props,
-              beforeUpload: file => beforeUpload && beforeUpload(file, this),
+              beforeUpload: file => (beforeUpload ? beforeUpload(file, this) : true),
               onSuccess: (response, file, fileList) => {
-                this.$emit('change', this.multiple ? fileList : fileList[0] || (this.multiple ? [] : {}))
+                fileList = fileList.map(({ response = {}, ...rest }) => ({ ...rest, ...response.data }))
+                this.$emit('change', fileList)
                 onSuccess && onSuccess(response, file, fileList)
               },
               onRemove: (file, fileList) => {
-                this.$emit('change', this.multiple ? fileList : fileList[0] || (this.multiple ? [] : {}))
+                fileList = fileList.map(({ response = {}, ...rest }) => ({ ...rest, ...response.data }))
+                this.$emit('change', fileList)
                 onRemove && onRemove(file, fileList)
               }
             }
           },
-          [disabled ? null : defaultChildren || (drag ? DragUploadTrigger : [NormalUploadTrigger]), UploadStyle]
+          [disabled ? '' : defaultChildren || (drag ? DragUploadTrigger : [NormalUploadTrigger]), UploadStyle]
         )
 
         return !viewWithCount
