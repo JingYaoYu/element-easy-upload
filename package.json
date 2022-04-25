@@ -1,6 +1,6 @@
 {
   "name": "@yizhai/easy-upload",
-  "version": "1.0.12",
+  "version": "1.0.13",
   "description": "easy-upload",
   "private": false,
   "main": "./dist/easy-upload.umd.min.js",
