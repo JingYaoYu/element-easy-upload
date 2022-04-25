@@ -186,6 +186,7 @@ export default {
               ...this.$props,
               beforeUpload: file => (beforeUpload ? beforeUpload(file, this) : true),
               onSuccess: (response, file, fileList) => {
+                console.log(fileList)
                 fileList = fileList.map(({ response = {}, ...rest }) => ({ ...rest, ...response.data }))
                 this.$emit('change', fileList)
                 onSuccess && onSuccess(response, file, fileList)
