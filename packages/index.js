@@ -186,13 +186,12 @@ export default {
               ...this.$props,
               beforeUpload: file => (beforeUpload ? beforeUpload(file, this) : true),
               onSuccess: (response, file, fileList) => {
-                console.log(fileList)
-                fileList = fileList.map(({ response = {}, ...rest }) => ({ ...rest, ...response.data }))
+                fileList = fileList.map(({ response = {}, ...rest }) => (Object.assign(response.data || {}, rest)))
                 this.$emit('change', fileList)
                 onSuccess && onSuccess(response, file, fileList)
               },
               onRemove: (file, fileList) => {
-                fileList = fileList.map(({ response = {}, ...rest }) => ({ ...rest, ...response.data }))
+                fileList = fileList.map(({ response = {}, ...rest }) =>  (Object.assign(response.data || {}, rest)))
                 this.$emit('change', fileList)
                 onRemove && onRemove(file, fileList)
               }
